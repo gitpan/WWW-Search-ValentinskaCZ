@@ -18,7 +18,7 @@ Readonly::Scalar my $VALENTINSKA_CZ => 'http://valentinska.cz/';
 Readonly::Scalar my $VALENTINSKA_CZ_ACTION1 => 'index.php?hledani=Vyhledej&hltex=';
 
 # Version.
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Setup.
 sub native_setup_search {
@@ -72,6 +72,7 @@ sub native_retrieve_some {
 		foreach my $book_hr (@{$books_hr->{'books'}}) {
 			_fix_url($book_hr, 'url');
 			_fix_url($book_hr, 'cover_url');
+			$self->_remove_tr($book_hr, 'title');
 			push @{$self->{'cache'}}, $book_hr;
 		}
 	}
@@ -85,6 +86,17 @@ sub _fix_url {
 	if (exists $book_hr->{$url}) {
 		$book_hr->{$url} = $VALENTINSKA_CZ.$book_hr->{$url};
 	}
+	return;
+}
+
+# Remove trailing whitespace.
+sub _remove_tr {
+	my ($self, $book_hr, $key) = @_;
+	if (! exists $book_hr->{$key}) {
+		return;
+	}
+	$book_hr->{$key} =~ s/^\s+//gms;
+	$book_hr->{$key} =~ s/\s+$//gms;
 	return;
 }
 
@@ -190,6 +202,6 @@ BSD license.
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut
